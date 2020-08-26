@@ -45,6 +45,17 @@ module Kitchen
         options
       end
 
+      def azure_options
+        options = { tenant_id: "6",
+                    subscription_id: "11",
+                    credentials: "14",
+                    active_directory_settings: "22",
+                    base_url: "26" }
+        options[:client_id] = "12"
+        options[:client_secret] = "7"
+        options
+      end
+
       private
 
       def logger
@@ -91,7 +102,7 @@ module Kitchen
           ::MsRestAzure::ApplicationTokenProvider.new(tenant_id, client_id, client_secret, ad_settings)
         elsif client_id
           ::MsRestAzure::MSITokenProvider.new(50342, ad_settings, { client_id: client_id })
-        else
+        elsif
           ::MsRestAzure::MSITokenProvider.new(50342, ad_settings)
         else
           ::MsRestAzure::AzureCliTokenProvider.new(ad_settings)
