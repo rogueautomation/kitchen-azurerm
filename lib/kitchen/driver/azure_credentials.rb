@@ -93,6 +93,8 @@ module Kitchen
           ::MsRestAzure::MSITokenProvider.new(50342, ad_settings, { client_id: client_id })
         else
           ::MsRestAzure::MSITokenProvider.new(50342, ad_settings)
+        else
+          ::MsRestAzure::AzureCliTokenProvider.new(ad_settings)
         end
       end
 
