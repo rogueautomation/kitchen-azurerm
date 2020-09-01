@@ -86,11 +86,28 @@ module Kitchen
         ENV["AZURE_CLIENT_SECRET"] || credentials_property("client_secret")
       end
 
+      # Retrieve a token based upon the preferred authentication method.
+      #
+      # @return [::MsRest::TokenProvider] A new token provider object.
       def token_provider
+        # Login with a credentials file or setting the environment variables
+        #
+        # Typically used with a service principal.
         if client_id && client_secret
           ::MsRestAzure::ApplicationTokenProvider.new(tenant_id, client_id, client_secret, ad_settings)
+        # Login with a Managed Service Identity.
+        #
+        # Typically used with a Managed Service Identity when you have a particular object registered in a tenant.
         elsif client_id
           ::MsRestAzure::MSITokenProvider.new(50342, ad_settings, { client_id: client_id })
+        # Login using the Azure CLI
+        #
+        # Typically used when you want to rely upon `az login` as your preferred authentication method.
+        elsif ENV["USE_AZ_LOGIN"]
+          ::MsRestAzure::AzureCliTokenProvider.new(ad_settings)
+        # Default approach to inheriting existing object permissions (application or device this code is running on).
+        #
+        # Typically used when you want to inherit the permissions of the system you're running on that are in a tenant.
         else
           ::MsRestAzure::MSITokenProvider.new(50342, ad_settings)
         end
